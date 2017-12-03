@@ -1,0 +1,49 @@
+{% extends "base.html" %} 
+{% block title %} Tambah Pengguna {% endblock %} 
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <h3>{{ judul }}</h3>
+        <p><a href="{{ url_for('kelolauser') }}" class="btn btn-primary"><span class="fa fa-arrow-left"></span>&nbsp;Kembali ke Kelola Pengguna</a></p>
+        <div class="col-sm-8">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                  <form action="{{ url_for(actsubmit) }}" method="POST" class="form-horizontal">
+                    <div class="form-group">
+                    <label class="control-label col-sm-4">Nama Pengguna</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="username" maxlength="15" class="form-control" value="{{ isi['username'] }}">
+                        <input type="hidden" name="id" maxlength="15" class="form-control" value="{{ isi['id'] }}">
+                    </div>
+                    </div>     
+                    <!--div class="form-group">
+                    <label class="control-label col-sm-4">Password</label>
+                    <div class="col-sm-8">       
+                        <input type="password" name="password" class="form-control">
+                        {% if request.path == '/edituser' %}<em style='color:gray'>Biarkan Kosong Jika Password Tidak Diganti</em>
+                        {% endif %}
+                    </div>
+                    </div-->
+                    <div class="form-group">
+                    <label class="control-label col-sm-4">Level Pengguna</label>
+                    <div class="col-sm-8">
+                        <select name="level" class="form-control">
+                        <option value="1" {% if isi['jabatan'] == 1 %} selected {% endif %}>Administrator</option>
+                        <option value="2" {% if isi['jabatan'] == 2 %} selected {% endif %}>Direktur</option>
+                        </select>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label class="control-label col-sm-4"></label>
+                    <div class="col-sm-8"><input type="submit" name="useract" class="btn btn-md btn-info" value="{{valsubmit}}"/>&nbsp;<input type="reset" name="useract" class="btn btn-md btn-warning" value="Reset"/></div>
+                    </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+     

@@ -1,0 +1,191 @@
+{% extends "base.html" %} {% block title %} Pelatihan Data {% endblock %} {% block body %}
+<h3>Pelatihan Data</h3>
+<div class="panel panel-primary">
+  <div class="panel-heading">Parameter Pelatihan</div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-6">
+        <form action="{{ url_for('latihaja') }}" method='POST'>
+          <div class="form-group">
+            <label for='innode'>Input Node</label>
+            <input type="text" name="in_node_param" id="innode" class="form-control" value="{{ dataparam['input_node'] }}"/>
+          </div>
+          <div class="form-group">
+            <label for='lrate'>Learning Rate</label>
+            <input type="text" name="lrate_param" id="lrate" class="form-control" value="{{ dataparam['l_rate'] }}" />
+          </div>
+          <div class="form-group">
+            <label for='maxepoch'>Max Epoch</label>
+            <input type="text" name="maxepoch_param" id="maxepoch" class="form-control" value="{{ dataparam['max_epochs'] }}" />
+          </div>
+          <div class="form-group">
+            <label for='hnode'>Hidden Node</label>
+            <input type="text" name="hnode_param" id="hnode" class="form-control" value="{{ dataparam['hidden_node'] }}" />
+          </div>
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit" name="saveparam">Simpan Parameter dan Jalankan</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-sm-6">
+        <div class="well" style="background-color: #efefef">
+          <h4>Keterangan parameter:</h4>
+          <ul>
+            <li><strong>Input Node</strong><br>Menentukan jumlah node pada Neural Network</li>
+            <li><strong>Learning Rate</strong><br>Menentukan nilai pembelajaran yang digunakan untuk memperbarui weight</li>
+            <li><strong>Max Epoch</strong><br>Menentukan iterasi maksimal model Neural Network dilatih</li>
+            <li><strong>Hidden Node</strong><br>Menentukan berapa banyak layer tersembunyi pada Neural Network</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-8">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-primary">
+          <div class="panel-heading">Data Latih</div>
+          <div class="panel-body">
+            <table id="datanormal" class="table table-responsive table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Hasil Produksi</th>
+                  <th>Hasil Panen</th> 
+                  <th>Hasil Produksi<br>(Dinormalkan)</th>
+                  <th>Hasil Panen<br>(Dinormalkan)</th>
+                  <th>Hasil Panen<br>(Prediksi)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in dataparam['X_raw'] %}
+                <tr>
+                  <td>{{ dataparam['tanggal'][loop.index-1] }}</td>
+                  <td>{{ i }}</td>
+                  <td>{{ dataparam['y_raw'][loop.index-1] }}</td>
+                  <td>{{ ('%0.3f')|format(dataparam['X_norm'][loop.index-1]|float) }}</td>
+                  <td>{{ ('%0.3f')|format(dataparam['y_norm'][loop.index-1]|float) }}</td>
+                  <td>{{ ('%0.3f')|format(dataparam['output'][loop.index-1]|float) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Parameter dan Hasil Pelatihan
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped table-bordered">
+            <tr>
+              <th>Final Weight</th>
+              <td>
+              {% for wg in dataparam['weight'] %}
+              [{% if loop.index <= dataparam['hidden_node'] %}{{ loop.index }}{% else %} Bias {% endif %}]: 
+              {{ ('%0.3f')|format(wg|float) }} <br>
+              {% endfor %}
+              </td>
+            </tr>
+            <tr>
+              <th>Final Center</th>
+              <td>{% for c in dataparam['center'] %}
+                [{{ loop.index }}]: 
+                {{ ('%0.3f')|format(c|float) }} <br>
+                {% endfor %}
+              </td>
+            </tr>
+            <tr>
+              <th>Error</th>
+              <td>{{ ('%0.3f')|format(dataparam['error']|float) }}%</td>
+            </tr>
+          </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading">Plot Hasil Pelatihan</div>
+      <div class="panel-body">
+        <canvas id="chartlatih" width="700px" height="300px" style="margin:0 auto"><!-- container chart.js disini --></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block css %}
+<link href="{{ url_for('static', filename='css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
+{% endblock  %}
+{% block script %}
+<script src="{{ url_for('static',filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static',filename='js/dataTables.bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static',filename='js/Chart.min.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $("#datanormal").DataTable();
+  });
+    var config = {
+     type: 'line',
+     data: {
+      labels :  {{ hitungan }},
+      datasets : [
+        {
+          label: "Hasil Prediksi Pelatihan",
+          backgroundColor: 'rgba(5,5,220,.6)',
+          borderColor: 'rgba(5,5,220,.6)',
+          data : {{ dataparam['output'] }},
+          fill: false
+        },
+        {
+          label: "Data Asli",
+          backgroundColor: 'rgba(10,220,5,.6)',
+          borderColor: 'rgba(10,220,5,.6)',
+          data : {{ dataparam['y_norm'] }},
+          fill:false
+        }
+      ]
+     },
+     options: {
+        animation: {
+          duration: 0
+        },
+        hover: {
+          animationDuration: 0
+        },
+        responsiveAnimationDuration: 0,
+        scales: {
+            xAxes: [{
+                display: false,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Data'
+                }
+            }],
+            yAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Output'
+                },
+                ticks:{
+                  max: 1,
+                  min: 0,
+                  stepsize: 0.5
+                }
+            }]
+        }
+      }
+    };
+    window.onload = function() {
+      var ctx = document.getElementById("chartlatih").getContext("2d");
+      window.myLine = new Chart(ctx, config);
+    };
+</script> {% endblock %}

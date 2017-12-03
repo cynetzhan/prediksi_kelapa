@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %} Data {% endblock %}
+{% block body %}
+<div class="panel panel-default">
+    <div class="panel-heading">Data Kelapa Sawit</div>
+    <div class="panel-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>Tanggal</td>
+                    <td>Hasil Produksi</td>
+                    <td>Hasil Panen</td>
+                </tr>
+            </thead>
+            <tbody>
+            {% for dt in data %}
+                <tr>
+                    <td>{{ dt['DATE'] }}</td>
+                    <td>{{ dt['PROUCTION'] }}</td>
+                    <td>{{ dt['PANEN'] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
