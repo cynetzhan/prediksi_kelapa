@@ -148,7 +148,12 @@ def datauji():
 
 @app.route('/laporan')
 def laporan():
-    pass
+    if auth_check([1,2]) != True:
+        return redirect(url_for('login'))
+    file_json = os.path.join(app.root_path,'log-uji.json')
+    json_raw = codecs.open(file_json,'r',encoding='utf-8').read()
+    param = json.loads(json_raw)
+    return render_template('laporan.html', dataparam=param, hitungan=range(len(datakita)))
 
 @app.route('/unggahdata', methods=['POST'])
 def unggahdata():

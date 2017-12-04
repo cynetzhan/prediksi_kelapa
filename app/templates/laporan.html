@@ -1,0 +1,117 @@
+{% extends "base.html" %} {% block title %} Laporan Hasil Prediksi {% endblock %} {% block body %}
+<h3>Hasil Prediksi</h3>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-primary">
+          <div class="panel-heading">Hasil Prediksi Produksi Kelapa Sawit</div>
+          <div class="panel-body">
+            <table id="datanormal" class="table table-responsive table-striped table-bordered">
+                <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Hasil Produksi</th>
+                      <th>Hasil Panen</th> 
+                      <th>Hasil Panen<br>(Prediksi)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for i in dataparam['X_raw'] %}
+                    <tr>
+                      <td>{{ dataparam['tanggal'][loop.index-1] }}</td>
+                      <td>{{ i }}</td>
+                      <td>{{ dataparam['y_raw'][loop.index-1] }}</td>
+                      <td>{{ ('%0.3f')|format(dataparam['denorm'][loop.index-1]|float) }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    
+  </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">Plot Hasil Pelatihan</div>
+        <div class="panel-body">
+          <canvas id="chartlatih" width="700px" height="300px" style="margin:0 auto"><!-- container chart.js disini --></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block css %}
+<link href="{{ url_for('static', filename='css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
+{% endblock  %}
+{% block script %}
+<script src="{{ url_for('static',filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static',filename='js/dataTables.bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static',filename='js/Chart.min.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $("#datanormal").DataTable();
+  });
+    var config = {
+     type: 'line',
+     data: {
+      labels :  {{ hitungan }},
+      datasets : [
+        {
+          label: "Hasil Prediksi Pelatihan",
+          backgroundColor: 'rgba(5,5,220,.6)',
+          borderColor: 'rgba(5,5,220,.6)',
+          data : {{ dataparam['denorm'] }},
+          fill: false
+        },
+        {
+          label: "Data Asli",
+          backgroundColor: 'rgba(10,220,5,.6)',
+          borderColor: 'rgba(10,220,5,.6)',
+          data : {{ dataparam['y_raw'] }},
+          fill:false
+        }
+      ]
+     },
+     options: {
+        animation: {
+          duration: 0
+        },
+        hover: {
+          animationDuration: 0
+        },
+        responsiveAnimationDuration: 0,
+        scales: {
+            xAxes: [{
+                display: false,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Data'
+                }
+            }],
+            yAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Output'
+                },
+                ticks:{
+                  max: 1,
+                  min: 0,
+                  stepsize: 0.5
+                }
+            }]
+        }
+      }
+    };
+    window.onload = function() {
+      var ctx = document.getElementById("chartlatih").getContext("2d");
+      window.myLine = new Chart(ctx, config);
+    };
+</script> {% endblock %}
