@@ -8,7 +8,7 @@ from app import app
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-import rbfnn
+from . import rbfnn
 
 def connect_excel(excel=''):
     if excel == '' or os.path.isfile(excel) != True:
