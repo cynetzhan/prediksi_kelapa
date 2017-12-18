@@ -1,7 +1,49 @@
 {% extends "base.html" %}
 {% block body %}
+<style>
+    body{background-image:url('{{ url_for('static',filename='images/bgsawit.jpg') }}'); background-size:cover}
+</style>
     <div class="row">
-        <div class="col-sm-4 col-sm-offset-4">
+        <div class="col-sm-8">
+            <div class="panel">
+                <div class="panel-body">
+                    <div style="text-align:center">
+                        <img src="static/images/agri.png" />
+                        <h3>Selamat Datang di Sistem Prediksi Produksi Kelapa Sawit</h3>
+                        <h4>PT. Mitra Unggul Pusaka</h4>
+                    </div>
+                    <h5>Login Untuk Dapat Mengakses Fitur Sistem Berikut:</h5>
+                    <div class="media">
+                    <div class="media-left">
+                        <span class="fa fa-gear" style="font-size:4em"></span>
+                    </div>
+                    <div class="media-body">
+                        <br>
+                        <h4 class="media-heading">Prediksi Data Produksi Sawit</h4>
+                    </div>
+                    </div>
+                    <div class="media">
+                        <div class="media-left">
+                            <span class="fa fa-database" style="font-size:4em"></span>
+                        </div>
+                        <div class="media-body">
+                            <br>
+                            <h4 class="media-heading">Kelola Data Pelatihan dan Pengujian</h4>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="media-left">
+                            <span class="fa fa-user" style="font-size:4em"></span>
+                        </div>
+                        <div class="media-body">
+                            <br>
+                            <h4 class="media-heading">Kelola Pengguna Sistem</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h4>Masuk Ke Sistem</h4>

@@ -8,7 +8,7 @@ from app import app
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-import rbfnn
+from . import rbfnn
 
 def connect_excel(excel=''):
     if excel == '' or os.path.isfile(excel) != True:
@@ -148,12 +148,16 @@ def datauji():
 
 @app.route('/laporan')
 def laporan():
-    if auth_check([1,2]) != True:
-        return redirect(url_for('login'))
-    file_json = os.path.join(app.root_path,'log-uji.json')
-    json_raw = codecs.open(file_json,'r',encoding='utf-8').read()
-    param = json.loads(json_raw)
-    return render_template('laporan.html', dataparam=param, hitungan=range(len(datakita)))
+		if auth_check([1,2]) != True:
+			return redirect(url_for('login'))
+		namafile = os.path.join(app.config['UPLOAD_FOLDER'],'data-uji.csv')
+		data = connect_excel(namafile)
+		mixmax = MinMaxScaler()
+		datakita = mixmax.fit_transform(pd.DataFrame(data={'production':data['PROUCTION'],'panen':data['PANEN']}, columns=['production','panen']))
+		file_json = os.path.join(app.root_path,'log-uji.json')
+		json_raw = codecs.open(file_json,'r',encoding='utf-8').read()
+		param = json.loads(json_raw)
+		return render_template('laporan.html', dataparam=param, hitungan=range(len(datakita)))
 
 @app.route('/unggahdata', methods=['POST'])
 def unggahdata():
