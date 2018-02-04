@@ -1,0 +1,74 @@
+{% extends "base.html" %} 
+{% block title %} Prediksi {% endblock %} 
+{% block body %}
+<h3>Prediksi</h3>
+<div class="panel panel-primary">
+  <div class="panel-heading">Parameter Pelatihan</div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-6">
+        <form action="{{ url_for('prediksi') }}" method='POST'>
+          <div class="form-group">
+            <label for='innode'>Tanggal Untuk Diprediksi</label>
+            <input type="date" name="tanggal" id="tgl" class="form-control" value="{{ tgl.strftime('%Y-%m-%d') }}"/>
+            <br><span><em>Anda hanya dapat memprediksi hasil panen untuk 1 hari setelah tanggal terakhir di dataset, atau tanggal yang ada di dataset. </em>Sistem akan menggunakan tanggal terakhir apabila tanggal yang dimasukkan tidak dapat diprediksi. </span>
+          </div>
+          
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit" name="saveparam">Prediksi</button>
+          </div>
+        </form>
+        <table class="table table-striped table-bordered">
+          <tr>
+            <th colspan="2">Parameter Untuk Prediksi</th>
+          </tr>
+          <tr>
+            <th>Data Input</th>
+            <td>{{ paramlatih['input_node'] }} Hari Sebelum {{ tgl.strftime('%d %B %Y') }}</td>
+          </tr>
+          <tr>
+            <th>Weight</th>
+            <td>{% for wg in paramlatih['weight'] %}
+              [{% if loop.index <= paramlatih['hidden_node'] %}{{ loop.index }}{% else %} Bias {% endif %}]: 
+              {{ ('%0.3f')|format(wg|float) }} <br>
+              {% endfor %}</td>
+          </tr>
+          <tr>
+            <th>Center</th>
+            <td>{% for c in paramlatih['center'] %}
+              [{{ loop.index }}]: 
+              {{ ('%0.3f')|format(c|float) }} <br>
+              {% endfor %}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="col-sm-6">
+        <strong>Hasil Prediksi</strong>
+        <div class="well" style="background-color: #efefef;text-align:center">
+          Hasil Panen untuk tanggal <strong>{{ tgl.strftime('%d %B %Y') }}</strong><br>
+          <h3>{{ ('%0.0f')|format(hasil|float) }}</h3>
+          <span style="text-align:center">Data Hasil Panen {{ paramlatih['input_node'] }} Hari Terakhir</span>
+          <table class="table table-striped" style="text-align:center">
+            <thead>
+            <tr>
+              <th style="text-align:center">Tanggal</th>
+              <th style="text-align:center">Produksi</th>
+              <th style="text-align:center">Hasil Panen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in range(paramlatih['input_node']) %}
+            <tr>
+              <td>{{ sdata['DATE'][loop.index-1].strftime('%d-%m-%Y') }}</td>
+              <td>{{ sdata['PROUCTION'][loop.index-1] }}</td>
+              <td>{{ sdata['PANEN'][loop.index-1] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>  
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

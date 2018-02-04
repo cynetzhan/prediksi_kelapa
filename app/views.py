@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, json, codecs
-import sqlite3
+import os, json, codecs, datetime, sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
 import hashlib
 from werkzeug.utils import secure_filename
@@ -242,6 +241,23 @@ def pengujian():
     paramlatih = json.loads(json_raw)
     return render_template('pengujian.html', dataraw=data, datanorm=datakita, dataparam=param, paramlatih=paramlatih, hitungan=range(len(datakita)))
 
+@app.route('/prediksi', methods=['GET','POST'])
+def prediksi():
+    namafile = os.path.join(app.config['UPLOAD_FOLDER'],'data-latih.csv')
+    data = pd.read_csv(namafile,';', thousands='.', decimal=',', parse_dates=[1])
+    file_json = os.path.join(app.root_path,'log.json')
+    json_raw = codecs.open(file_json,'r',encoding='utf-8').read()
+    paramlatih = json.loads(json_raw)
+    tgl = data['DATE'].loc[data.shape[0]-1] + datetime.timedelta(1) # default ambil tanggal terakhir di dataset + 1 hari
+    if request.method == 'POST':
+        tgr = request.form['tanggal'].split('-')
+        tgl_temp = datetime.date(int(tgr[0]), int(tgr[1]), int(tgr[2]))
+        tgl = tgl_temp if data[data['DATE'] == tgl_temp].shape[0] == 1 else tgl
+    tglalu = tgl - datetime.timedelta(days=paramlatih['input_node'])
+    mask = (data['DATE'] >= tglalu) & (data['DATE'] < tgl)
+    selected_data = data.loc[mask]
+    hasil = rbfnn.predict(selected_data['PROUCTION'], selected_data['PANEN'], paramlatih['weight'], paramlatih['center'])
+    return render_template('prediksi.html', hasil=hasil, tgl=tgl, paramlatih=paramlatih, sdata=selected_data.reset_index())
 
 @app.route('/login', methods=['GET','POST'])
 def login():

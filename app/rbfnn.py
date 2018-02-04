@@ -93,7 +93,7 @@ def train(x, y, n_hidden = 5, input_node=5, ephocs=3000, lr=0.01, tanggal=[]):
 		iterlagi = True
 		count = 1
 		while iterlagi:
-		#for ittt in range(ephocs):
+		#for i in range(ephocs):
 				start = 0
 				end_d = start + input_node
 				out_i = []
@@ -199,7 +199,7 @@ def test(x, y, weight, center, n_hidden = 3, input_node=5, ephocs=3000, lr=0.01,
 		iterlagi = True
 		count = 1
 		while iterlagi:
-		#for ittt in range(ephocs):
+		#for i in range(ephocs):
 				start = 0
 				end_d = start + input_node
 				out_i = []
@@ -296,3 +296,27 @@ def test(x, y, weight, center, n_hidden = 3, input_node=5, ephocs=3000, lr=0.01,
 			'denorm' : denorm
 		}
 		return prep_data
+
+def predict(X, y, weight, center):
+		X_raw = X
+		y_raw = y
+		X = preprocessing(X)
+		y = preprocessing(y)
+		n_hidden = len(center)
+		center_dist = kmeans(X, n_hidden, center)
+		center_ = center_dist['center']
+		distance = center_dist['max_distance']
+		betas = [safe_div(distance[i],m.sqrt(center_[i])) for i in range(len(center_))]
+		gaussfunc = []
+		for c in range(len(center_)):
+				alldist = []
+				for xi in X:
+						dist = pow(xi - center_[c], 2)
+						alldist.append(dist)
+				gaussini = np.exp(safe_div(np.sum(alldist),pow(betas[c],2)))
+				gaussfunc.append(gaussini)
+		gauss_biased = gaussfunc
+		gauss_biased.append(1)
+		out_i = np.dot(gauss_biased, weight)
+		denorm = (out_i * (np.max(y_raw) - np.min(y_raw)) + np.min(y_raw))
+		return denorm

@@ -6,6 +6,7 @@
 /nbproject/
 .idea/*
 .vscode/*
+venv/
 
 ## Sublime Text cache files
 *.tmlanguage.cache
