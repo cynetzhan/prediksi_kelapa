@@ -1,10 +1,11 @@
 from __future__ import print_function, division
-import numpy as np  
+import numpy as np
 import pandas as pd
 import math as m
-from random import shuffle
+from sklearn.cluster import KMeans
+from sklearn.metrics.pairwise import euclidean_distances
 from math import pow
-from time import time
+
 
 def safe_div(x,y):
     if y == 0:
@@ -71,6 +72,18 @@ def kmeans(x,k,init_center=[]):
             # print("center belum sama!")
     dmax = [np.max(data_dist) for data_dist in all_distance]
     prep_data = {'center':new_center, 'max_distance':dmax}
+    return prep_data
+
+def kmeans_new(x,k,init_center=[]):
+    if init_center == [] :
+        init_center = x[:k]
+    kms = KMeans(n_clusters=k,init=np.array(init_center).reshape(-1,1))
+    x = np.array(x).reshape(-1,1)
+    kms.fit(x)
+    center = kms.cluster_centers_
+    dist = pd.DataFrame(euclidean_distances(x, center), columns=[0,1,2])
+    max_dist = [dist[i].max() for i in range(k)]
+    prep_data = {'center': center, 'max_distance': max_dist}
     return prep_data
 
 def train(x, y, n_hidden = 5, input_node=5, ephocs=3000, lr=0.01, tanggal=[]):

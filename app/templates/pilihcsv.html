@@ -54,8 +54,8 @@
           <td>{{ dataraw['DATE'][loop.index-1] }}</td>
           <td>{{ dataraw['PROUCTION'][loop.index-1] }}</td>
           <td>{{ dataraw['PANEN'][loop.index-1] }}</td>
-          <td>{{ dt[0] }}</td>
-          <td>{{ dt[1] }}</td>
+          <td>{{ ('%0.3f')|format(dt[0]|float) }}</td>
+          <td>{{ ('%0.3f')|format(dt[1]|float) }}</td>
         </tr>
         {% endfor %}
       </tbody>

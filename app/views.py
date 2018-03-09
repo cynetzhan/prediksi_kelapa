@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os, json, codecs, datetime, sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify, make_response
 import hashlib
 from werkzeug.utils import secure_filename
 from app import app
@@ -61,7 +61,10 @@ def close_db(error):
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    if session == None:
+        return redirect(url_for('login'))
+    else:
+        return render_template('index.html')
 
 @app.route('/about')
 def about():
@@ -157,6 +160,20 @@ def laporan():
 		json_raw = codecs.open(file_json,'r',encoding='utf-8').read()
 		param = json.loads(json_raw)
 		return render_template('laporan.html', dataparam=param, hitungan=range(len(datakita)))
+
+@app.route('/downloadlap')
+def downloadlap():
+    if auth_check([1,2]) != True:
+        return redirect(url_for('login'))
+    file_json = os.path.join(app.root_path,'log-uji.json')
+    json_raw = codecs.open(file_json,'r',encoding='utf-8').read()
+    param = json.loads(json_raw)
+    datareturn = pd.DataFrame(data={'tanggal': param['tanggal'], 'hasil produksi': param['X_raw'], 'hasil panen': param['y_raw'], 'prediksi hasil panen':param['denorm']}, columns=['tanggal','hasil produksi','hasil panen','prediksi hasil panen'])
+    response = make_response(datareturn.to_csv(sep=';', decimal=','))
+    cd = "attachment; filename=laporan_prediksi.csv"
+    response.headers['Content-Disposition'] = cd
+    response.mimetype = 'text/csv'
+    return response
 
 @app.route('/unggahdata', methods=['POST'])
 def unggahdata():

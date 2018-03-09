@@ -49,14 +49,37 @@
 {% endblock %}
 {% block css %}
 <link href="{{ url_for('static', filename='css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/buttons.dataTables.min.css') }}" rel="stylesheet">
 {% endblock  %}
 {% block script %}
 <script src="{{ url_for('static',filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static',filename='js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('static',filename='js/dataTables.buttons.min.js') }}"></script>
 <script src="{{ url_for('static',filename='js/dataTables.bootstrap.min.js') }}"></script>
 <script src="{{ url_for('static',filename='js/Chart.min.js') }}"></script>
 <script>
   $(document).ready(function () {
-    $("#datanormal").DataTable();
+    $("#datanormal").DataTable({
+      dom: 'lBrftip',
+      buttons: [
+        { 
+          extend: 'print',
+          text: '<span class="fa fa-download"></span> Cetak Laporan',
+          className: 'btn btn-primary',
+          title: 'Laporan Hasil Prediksi',
+          customize: function(win){
+            $(win.document.getElementsByTagName('h1')[0]).css('font-size','14pt').css('text-align','center');
+          }
+        },
+        {
+          text: '<span class="fa fa-download"></span> Unduh Laporan',
+          className: 'btn btn-primary',
+          action: function(e, dt, button, config){
+            window.location = "{{ url_for('downloadlap') }}";
+          }
+        }
+      ]
+    });
   });
     var config = {
      type: 'line',
@@ -114,4 +137,9 @@
       var ctx = document.getElementById("chartlatih").getContext("2d");
       window.myLine = new Chart(ctx, config);
     };
+    $(document).ready(function() {
+      $(".dt-button").each(function() {
+        $(this).removeClass('dt-button').removeClass('buttons-print');
+      })
+    })
 </script> {% endblock %}
